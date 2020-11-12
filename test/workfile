@@ -1,0 +1,32 @@
+let AuctionERC721 = artifacts.require('AuctionERC721')
+let AuctionNft = artifacts.require('AuctionNft') 
+let catchRevert = require("./exceptionHelpers.js").catchRevert
+
+
+contract('AuctionNft', function(accounts) {
+
+  const deployer =accounts[0];
+
+  beforeEach("create an instance of AuctionNft", async function() {
+      instanceERC721 = await AuctionERC721.new("Auction NFT", "ANFT", {from: accounts[0]});
+      instanceNft = await AuctionNft.new(instanceERC721.address, {from: accounts[0]});
+  })
+  
+  describe("Deploy", () => {
+
+
+    it("verify deployment and owner", async() => {
+      
+      
+    })
+  })
+  
+  describe("Functionnalities", () => {
+    it("can create au auction and verify its features", async() => {
+      await instance.addNewToken(deployer, "", {from: accounts[0]});
+      await instanceNft.createAuction(instanceERC721.address, 1, 0, {from: accounts[0]});
+    
+    
+  
+  })
+}
