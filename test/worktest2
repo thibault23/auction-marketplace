@@ -1,0 +1,102 @@
+1) verify instantiation and owner state variable
+2) can create an auction and verify its features
+3) can verify the auction different related balances and variables
+4) can verify auction info after bidding
+5) can verify that it is not possible to withdraw the nft if auction has not ended yet
+6) can verify that a current winner cannot withdraw a bid
+7) can verify that a current bidder cannot withdraw bid twice
+8) can verify the number of auction and tokenId are correct when multiple auctions
+9) verify that only the auctioneer can end his specific auction
+10) verify that the winner is the owner of the nft after 
+11) verify an auction process end to end workflow (multiple bids, winner)
+
+
+comments: 
+- change line 198
+- set pendingReturns to 0 in function withdrawBid
+- in function endAuction add a require on the fact that only auctioneer can end an auction
+- add a function to let the auctioneer withdraw the highest bid after auction endeed
+- in createAuction, should I verify ownership of token id??
+- change owner variable to public?? (test first)
+- require a first bid higher than start price
+
+
+//test1
+//Can safeTransferFrom your own coin to valid contract
+//This is where we use our ValidReceiver contract. Deploy that contract and send a token to it. If the transaction doesn’t fail and the contract is the new owner, then this test passes.
+//test2
+//Can’t safeTransferFrom your own coin to invalid contract
+//Similar to the last test, but we deploy our InvalidReceiver and when we send a token to it we expect the transaction to fail.
+
+
+let AuctionERC721 = artifacts.require('AuctionERC721')
+let AuctionNft = artifacts.require('AuctionNft')
+let catchRevert = require("./exceptionHelpers.js").catchRevert
+
+contract('AuctionNft', function(accounts) {
+
+  const deployer = accounts[0];
+  
+  beforeEach("create an instance of AuctionNft", async function() {
+      instanceERC721 = await AuctionERC721.new("Auction NFT", "ANFT", {from: accounts[0]});
+      instanceNft = await AuctionNft.new(instanceERC721.address, {from: accounts[0]});
+  })
+  
+  
+  
+  describe("Deploy", () => {
+  
+    it("verify deployment and owner", async() => {
+      let ownerCheck = await.instanceNft.owner.call();
+      let contractAddress = await.instanceNft.auctionERC721.call();
+      
+      assert.equal(contractAddress, instanceERC721.address);
+      assert.equal(ownerCheck,deployer);
+    })
+  })
+  
+  
+  describe("Functionnalities", () => {
+  
+    it("can create au auction and verify its features", async() => {
+    
+      await instanceERC721.addNewToken(deployer, "", {from: accounts[0]});
+      //need to give approval to the auction contract
+      await instanceERC721.approve(instanceNft.address, 0, {from: accounts[0]});
+      await instanceNft.createAuction(instanceERC721.address, 1, 0, {from: accounts[0]});
+      let nftOwner = await instanceERC721.ownerOf(0);
+      
+      assert.equal(nftOwner, instanceNft.address);
+    })
+  
+    it("can verify the auction different related balances and variables", async() => {
+    
+      await instanceERC721.addNewToken(deployer, "", {from: accounts[0]});
+      await instanceERC721.approve(instanceNft.address, 0, {from: accounts[0]});
+      await instanceNft.createAuction(instanceERC721.address, 1, 0, {from: accounts[0]});
+      let balanceCheck = await instanceERC721.balanceOf(instanceNft.address);
+      let auctionCountCheck = await instanceNft.auctionCount.call();
+      
+      assert.equal(balanceCheck, 1);
+      assert.equal(auctionCountCheck, 1);
+    })
+    
+    it("can verify auction info after bidding", async() => {
+      
+      await instanceERC721.addNewToken(deployer, "", {from: accounts[0]});
+      await instanceERC721.approve(instanceNft.address, 0, {from: accounts[0]});
+      await instanceNft.createAuction(instanceERC721.address, 1, 0, {from: accounts[0]});
+      await instanceNft.bidAuction(0, {from: accounts[1], value: web3.toWei(2)});
+      
+      let [tokenERC721, auctioneer, currentWinner, auctionId, auctionStatus, highestBid, startPrice, tokenId, auctionComplete] = await auction.getFarmInfo(0, {from: accounts[0]});
+      assert.equal(instanceERC721.address, tokenERC721);
+      assert.equal(deployer, auctioneer);
+      assert.equal(accounts[1], currentWinner);
+      assert.equal(0, auctionId);
+      assert.equal("Bidding", auctionStatus);
+      assert.equal(2, highestBid);
+      assert.equal(1, startPrice);
+      assert.equal(0, tokenId);
+      assert.equal("false", auctionComplete);
+})
+})
