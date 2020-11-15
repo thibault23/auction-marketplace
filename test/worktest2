@@ -19,6 +19,7 @@ comments:
 - in createAuction, should I verify ownership of token id??
 - change owner variable to public?? (test first)
 - require a first bid higher than start price
+- can you withdraw an nft twice??
 
 
 //test1
