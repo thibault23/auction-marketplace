@@ -12,14 +12,14 @@
 
 
 comments: 
-- change line 198
-- set pendingReturns to 0 in function withdrawBid
-- in function endAuction add a require on the fact that only auctioneer can end an auction
-- add a function to let the auctioneer withdraw the highest bid after auction endeed
-- in createAuction, should I verify ownership of token id??
-- change owner variable to public?? (test first)
-- require a first bid higher than start price
-- can you withdraw an nft twice??
+- change line 198 : done
+- set pendingReturns to 0 in function withdrawBid : done
+- in function endAuction add a require on the fact that only auctioneer can end an auction : done
+- add a function to let the auctioneer withdraw the highest bid after auction endeed : to do
+- in createAuction, should I verify ownership of token id?? : don't think so as safetransfer will fail as long as both createauction and startauction are connected
+- change owner variable to public?? (test first) : done
+- require a first bid higher than start price : done
+- can you withdraw an nft twice?? : done
 
 
 //test1
